@@ -1,0 +1,43 @@
+{
+  "name": "markdown-editor",
+  "version": "0.0.1",
+  "description": "electron-react-brace-marked base markdown editor",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kenokabe/markdown-editor.git"
+  },
+  "keywords": [
+    "markdown",
+    "editor",
+    "electron",
+    "react",
+    "brace",
+    "marked"
+  ],
+  "author": "Ken OKABE",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kenokabe/markdown-editor/issues"
+  },
+  "homepage": "https://github.com/kenokabe/markdown-editor#readme",
+  "dependencies": {
+    "bootstrap": "^4.1.1",
+    "electron": "^2.0.2",
+    "marked": "^0.4.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "reactstrap": "^6.1.0",
+    "timeline-monoid": "^1.6.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "eslint": "^4.19.1",
+    "eslint-plugin-react": "^7.9.1"
+  }
+}
