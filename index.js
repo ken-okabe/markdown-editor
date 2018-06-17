@@ -1,3 +1,4 @@
+
 (() => {
   const React = require("react");
   const {render} = require("react-dom");
@@ -12,6 +13,11 @@
   const remote = require("electron").remote;
   const Dialog = remote.dialog;
 
+  const mermaid = require("mermaid");
+
+  mermaid.initialize({
+    startOnLoad: true
+  });
   //=============================================
 
   const TimelineEl = (timelineEl) => {
@@ -52,20 +58,17 @@
 
   const autoSave = T(
     (timeline) => {
-      const f = () => {
-        timeline[now] = true;
-      };
+      const f = () => timeline[now] = true;
       setInterval(f, 5000);
     }
   ).wrap(
-    () => {
-      (!!fileTL[now])
-        ? (() => {
-          fs.writeFile(fileTL[now], markdownTL[now]);
-        })()
-        : true;
-    }
-
+    () => (!!fileTL[now])
+      ? (() => {
+        const f = a => a; //do nothing
+        fs.writeFile(fileTL[now], markdownTL[now], f);
+        return true;
+      })()
+      : true
   );
 
   const Main = () => {
@@ -124,7 +127,7 @@
   const Panes = (style0) => {
     const style1 = {
       "width": "100%",
-      "height": "100%",
+      "height": "95%",
       "margin": "0px",
       "padding": "0px",
       "backgroundColor": "#000000"
@@ -151,6 +154,26 @@
 
   const markdownTL = T();
 
+  const renderer = new marked.Renderer();
+  renderer.code = (code, language) => {
+    return (code.match(/^sequenceDiagram/)
+    || code.match(/^graph/))
+      ? "<div class='mermaid'>" + code + "</div>"
+      : "<pre><code>" + code + "</code></pre>";
+  };
+
+  marked.setOptions({
+    renderer: renderer,
+    pedantic: false,
+    gfm: true,
+    tables: true,
+    breaks: false,
+    sanitize: false,
+    smartLists: true,
+    smartypants: false,
+    xhtml: false
+  });
+
   const htmlTL = markdownTL
     .sync((text) => marked(text))
     .sync((html) => <div
@@ -165,19 +188,21 @@
         const onInput = (e) => {
           markdownTL[now] = e.target.innerText;
         };
+        const onScroll = (e) => {
+          //alert(e);
+        };
         const style = {
           "width": "100%",
           "height": "100%",
           "padding": "15px",
           "overflow": "auto",
-          "backgroundColor": "#1B2D33",
-          "color": "white",
-          "fontSize": "22px"
         };
-        return (<div style={style}
+        return (<div
           contentEditable
+          style={style}
+          className={"editor"}
           onInput={onInput}
-
+          onScroll={onScroll}
           dangerouslySetInnerHTML={{
             __html: contentHTML
           }}
@@ -189,16 +214,20 @@
   const Viewer = () => TimelineEl(
     htmlTL
       .sync(innerHTML => {
+        const onScroll = (e) => {
+          //alert(e);
+        };
         const style = {
           "width": "100%",
           "height": "100%",
           "padding": "15px",
-          "overflow": "auto",
-          "backgroundColor": "#ffffff",
-          "color": "#000000",
-          "fontSize": "22px"
+          "overflow": "auto"
         };
-        return <div style={style}>{innerHTML}</div>;
+        return <div
+          style={style}
+          className={"viewer"}
+          onScroll={onScroll}
+          >{innerHTML}</div>;
       })
   );
   //----------

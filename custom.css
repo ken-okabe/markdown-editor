@@ -1,0 +1,21 @@
+
+.editor {font-size: 20px;
+         color: white;
+         background-color:#1B2D33;
+}
+
+.viewer {font-size: 20px;
+         color: #000000;
+         background-color:#ffffff;
+}
+.viewer pre {background-color: #eeeeee;
+             padding: 10px;}
+
+table{
+      border:solid 2px #ccc;
+      border-collapse:collapse;
+}
+table td,
+table th{
+      border:solid 1px #ccc;
+}
