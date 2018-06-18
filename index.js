@@ -63,20 +63,7 @@
       setTimeout(f, 1000);
     });
 
-  const autoSave = T(
-    (timeline) => {
-      const f = () => timeline[now] = true;
-      setInterval(f, 5000);
-    }
-  ).wrap(
-    () => (!!fileTL[now])
-      ? (() => {
-        const f = a => a; //do nothing
-        fs.writeFile(fileTL[now], markdownTL[now], f);
-        return true;
-      })()
-      : true
-  );
+
 
   const Main = () => {
     const style0 = {
@@ -160,6 +147,8 @@
       );
   };
 
+
+
   const markdownTL = T();
 
   const renderer = new marked.Renderer();
@@ -182,6 +171,27 @@
       dangerouslySetInnerHTML={{
         __html: html
       }}/>);
+
+
+  const autoSaveTL = T(
+    (timeline) => {
+      const f = () => timeline[now] = true;
+      setInterval(f, 5000);
+    }
+  );
+
+  (autoSaveTL)(markdownTL)
+    .wrap(() => (!!fileTL[now])
+      ? (() => {
+        const f = a => a; //do nothing
+        fs.writeFile(fileTL[now], markdownTL[now], f);
+        return true;
+      })()
+      : true
+  );
+
+
+
 
 
   const oneSecInterval = T(
