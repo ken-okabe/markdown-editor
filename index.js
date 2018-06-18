@@ -13,7 +13,6 @@
   const remote = require("electron").remote;
   const Dialog = remote.dialog;
 
-
   //=============================================
 
   const TimelineEl = (timelineElm) => {
@@ -60,8 +59,6 @@
         viewerRef[now] = document.getElementById("viewer");
         viewerRef[now].scrollTop = 1;
         editorRef[now].scrollTop = 1;
-
-
       };
       setTimeout(f, 1000);
     });
@@ -166,12 +163,6 @@
   const markdownTL = T();
 
   const renderer = new marked.Renderer();
-  renderer.code = (code, language) => {
-    return (code.match(/^sequenceDiagram/)
-    || code.match(/^graph/))
-      ? "<div class='mermaid'>" + code + "</div>"
-      : "<pre><code>" + code + "</code></pre>";
-  };
 
   marked.setOptions({
     renderer: renderer,
@@ -198,7 +189,6 @@
       const f = () => timeline[now] = true;
       setInterval(f, 10);
     });
-
 
   const editorH = T();
   const viewerH = T();
