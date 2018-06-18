@@ -24,17 +24,16 @@
   },
   "homepage": "https://github.com/kenokabe/markdown-editor#readme",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
     "bootstrap": "^4.1.1",
     "electron": "^2.0.2",
     "marked": "^0.4.0",
-    "mermaid": "^8.0.0-rc.8",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "reactstrap": "^6.1.0",
-    "timeline-monoid": "^1.6.1",
-    "babel-cli": "^6.26.0",
-    "babel-preset-react": "^6.24.1",
-    "babel-register": "^6.26.0"
+    "timeline-monoid": "^1.6.1"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
