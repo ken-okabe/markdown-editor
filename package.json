@@ -15,7 +15,6 @@
     "editor",
     "electron",
     "react",
-    "brace",
     "marked"
   ],
   "author": "Ken OKABE",
@@ -32,12 +31,12 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "reactstrap": "^6.1.0",
-    "timeline-monoid": "^1.6.1"
-  },
-  "devDependencies": {
+    "timeline-monoid": "^1.6.1",
     "babel-cli": "^6.26.0",
     "babel-preset-react": "^6.24.1",
-    "babel-register": "^6.26.0",
+    "babel-register": "^6.26.0"
+  },
+  "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-plugin-react": "^7.9.1"
   }

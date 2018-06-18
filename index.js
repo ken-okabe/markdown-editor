@@ -13,38 +13,38 @@
   const remote = require("electron").remote;
   const Dialog = remote.dialog;
 
-  const mermaid = require("mermaid");
 
-  mermaid.initialize({
-    startOnLoad: true
-  });
   //=============================================
 
-  const TimelineEl = (timelineEl) => {
+  const TimelineEl = (timelineElm) => {
+
     class TimelineComponent extends React.Component {
       constructor() {
         super();
+        this.myRef = React.createRef();
         this.state = {
-          el: timelineEl[now]
+          el: timelineElm[now]
         };
-        const dummyTL = timelineEl
+        const dummyTL = timelineElm
           .wrap((val) => {
             this.setState({
               el: val
             });
           });
       }
-      componentWillUnmount() {
-        //timelineEl.done = 1;
-      }
+
       render() {
         return (<span>{this.state.el}</span>);
       }
     }
+    const component = <TimelineComponent/>;
+
     return (<TimelineComponent/>);
   };
   //=============================================
 
+  const editorRef = T();
+  const viewerRef = T();
   const fileTL = T();
 
   const contentLoadTL = T(timeline => {
@@ -53,8 +53,18 @@
         timeline[now] = data;
       });
     });
-  }).wrap((data) => (markdownTL[now] = data));
+  }).wrap((data) => (markdownTL[now] = data))
+    .wrap(() => {
+      const f = () => {
+        editorRef[now] = document.getElementById("editor");
+        viewerRef[now] = document.getElementById("viewer");
+        viewerRef[now].scrollTop = 1;
+        editorRef[now].scrollTop = 1;
 
+
+      };
+      setTimeout(f, 1000);
+    });
 
   const autoSave = T(
     (timeline) => {
@@ -124,6 +134,7 @@
      </div>);
   };
 
+
   const Panes = (style0) => {
     const style1 = {
       "width": "100%",
@@ -181,6 +192,43 @@
         __html: html
       }}/>);
 
+
+  const oneSecInterval = T(
+    (timeline) => {
+      const f = () => timeline[now] = true;
+      setInterval(f, 10);
+    });
+
+
+  const editorH = T();
+  const viewerH = T();
+
+  const scrollEditorH = T();
+  const scrollViewerH = T();
+
+  const scrollEditor = T();
+  const scrollViewer = T();
+
+  const percent = (val) => (Math.round(val * 100) / 100);
+
+  const scrollEditorR = scrollEditor
+    .sync(val => percent((val + (editorH[now] / 2)) / scrollEditorH[now]));
+  const scrollViewerR = scrollViewer
+    .sync(val => percent((val + (viewerH[now] / 2)) / scrollViewerH[now]));
+
+  const scrollViewerTarget = (scrollEditorR)(oneSecInterval)
+    .sync(([ratio, interval]) => scrollViewerH[now] * ratio - (viewerH[now] / 2))
+    .wrap(target => {
+      viewerRef[now].scrollTop = target;
+    });
+  const scrollEditorTarget = (scrollViewerR)(oneSecInterval)
+    .sync(([ratio, interval]) => scrollEditorH[now] * ratio - (editorH[now] / 2))
+    .wrap(target => {
+      editorRef[now].scrollTop = target;
+    });
+
+
+
   const Editor = () => TimelineEl(
     contentLoadTL
       .sync(content => {
@@ -189,7 +237,9 @@
           markdownTL[now] = e.target.innerText;
         };
         const onScroll = (e) => {
-          //alert(e);
+          editorH[now] = e.target.clientHeight;
+          scrollEditorH[now] = e.target.scrollHeight;
+          scrollEditor[now] = e.target.scrollTop ;
         };
         const style = {
           "width": "100%",
@@ -199,8 +249,9 @@
         };
         return (<div
           contentEditable
-          style={style}
+          id={"editor"}
           className={"editor"}
+          style={style}
           onInput={onInput}
           onScroll={onScroll}
           dangerouslySetInnerHTML={{
@@ -215,7 +266,9 @@
     htmlTL
       .sync(innerHTML => {
         const onScroll = (e) => {
-          //alert(e);
+          viewerH[now] = e.target.clientHeight;
+          scrollViewerH[now] = e.target.scrollHeight;
+          scrollViewer[now] = e.target.scrollTop ;
         };
         const style = {
           "width": "100%",
@@ -223,9 +276,11 @@
           "padding": "15px",
           "overflow": "auto"
         };
+
         return <div
-          style={style}
+          id={"viewer"}
           className={"viewer"}
+          style={style}
           onScroll={onScroll}
           >{innerHTML}</div>;
       })
