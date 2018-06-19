@@ -1,6 +1,6 @@
 {
   "name": "markdown-editor",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "electron-react-brace-marked base markdown editor",
   "main": "main.js",
   "scripts": {
@@ -33,7 +33,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "reactstrap": "^6.1.0",
-    "timeline-monoid": "^1.6.1"
+    "timeline-monoid": "^1.9.99"
   },
   "devDependencies": {
     "eslint": "^4.19.1",

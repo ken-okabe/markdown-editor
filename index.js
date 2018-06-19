@@ -4,7 +4,7 @@
   const {render} = require("react-dom");
   const {Button, Col, Row, Container} = require("reactstrap");
 
-  const {T, now} = require("timeline-monoid");
+  const {T, now, log, mlog} = require("timeline-monoid");
   const marked = require("marked");
 
   const fs = require("fs");
@@ -20,50 +20,77 @@
     class TimelineComponent extends React.Component {
       constructor() {
         super();
-        this.myRef = React.createRef();
         this.state = {
           el: timelineElm[now]
         };
-        const dummyTL = timelineElm
-          .wrap((val) => {
+        const pipeline = timelineElm
+          .sync((val) => {
             this.setState({
               el: val
             });
           });
       }
-
       render() {
         return (<span>{this.state.el}</span>);
       }
     }
-    const component = <TimelineComponent/>;
-
     return (<TimelineComponent/>);
   };
   //=============================================
 
-  const editorRef = T();
-  const viewerRef = T();
   const fileTL = T();
 
   const contentLoadTL = T(timeline => {
-    fileTL.wrap((fileName) => {
-      fs.readFile(fileName, "utf8", (err, data) => {
-        timeline[now] = data;
+    const pipeline = fileTL
+      .sync((fileName) => {
+        fs.readFile(fileName, "utf8", (err, data) => {
+          timeline[now] = data;
+        });
+        return true;
       });
-    });
-  }).wrap((data) => (markdownTL[now] = data))
-    .wrap(() => {
+  });
+
+
+  const dummyTL = contentLoadTL
+    .sync((data) => (markdownTL[now] = data))
+    .sync(() => {
       const f = () => {
-        editorRef[now] = document.getElementById("editor");
-        viewerRef[now] = document.getElementById("viewer");
-        viewerRef[now].scrollTop = 1;
-        editorRef[now].scrollTop = 1;
+        document.getElementById("editor").scrollTop = 1;
+        document.getElementById("viewer").scrollTop = 1;
+
+        const insertTextAtCursor = (text) => {
+          var sel,
+            range,
+            html;
+          if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+              range = sel.getRangeAt(0);
+              range.deleteContents();
+              range.insertNode(document.createTextNode(text));
+            }
+          } else if (document.selection && document.selection.createRange) {
+            document.selection.createRange().text = text;
+          }
+        };
+        document.getElementById("editor")
+          .addEventListener("paste", (e) => {
+            e.preventDefault();
+            (e.clipboardData && e.clipboardData.getData)
+              ? (() => {
+                const text = e.clipboardData.getData("text/plain");
+                document.execCommand("insertHTML", false, text);
+              })()
+              : (window.clipboardData && window.clipboardData.getData)
+                ? (() => {
+                  var text1 = window.clipboardData.getData("Text");
+                  insertTextAtCursor(text1);
+                })()
+                : true;
+          });
       };
       setTimeout(f, 1000);
     });
-
-
 
   const Main = () => {
     const style0 = {
@@ -180,8 +207,8 @@
     }
   );
 
-  (autoSaveTL)(markdownTL)
-    .wrap(() => (!!fileTL[now])
+  const pipeline = (autoSaveTL)(markdownTL)
+    .sync(() => (!!fileTL[now])
       ? (() => {
         const f = a => a; //do nothing
         fs.writeFile(fileTL[now], markdownTL[now], f);
@@ -189,9 +216,6 @@
       })()
       : true
   );
-
-
-
 
 
   const oneSecInterval = T(
@@ -217,22 +241,28 @@
     .sync(val => percent((val + (viewerH[now] / 2)) / scrollViewerH[now]));
 
   const scrollViewerTarget = (scrollEditorR)(oneSecInterval)
-    .sync(([ratio, interval]) => scrollViewerH[now] * ratio - (viewerH[now] / 2))
-    .wrap(target => {
-      viewerRef[now].scrollTop = target;
+    .sync(([ratio, interval]) => scrollViewerH[now] * ratio - (viewerH[now] / 2));
+
+  const pipleineV = scrollViewerTarget
+    .sync(target => {
+      document.getElementById("viewer").scrollTop = target;
     });
   const scrollEditorTarget = (scrollViewerR)(oneSecInterval)
-    .sync(([ratio, interval]) => scrollEditorH[now] * ratio - (editorH[now] / 2))
-    .wrap(target => {
-      editorRef[now].scrollTop = target;
+    .sync(([ratio, interval]) => scrollEditorH[now] * ratio - (editorH[now] / 2));
+
+  const pipelineE = scrollEditorTarget
+    .sync(target => {
+      document.getElementById("editor").scrollTop = target;
     });
-
-
 
   const Editor = () => TimelineEl(
     contentLoadTL
       .sync(content => {
-        const contentHTML = content.replace(/\n/g, "<BR>");
+
+        const contentHTML = content
+          .replace(/\n/g, "<BR>");
+
+        console.log(contentHTML);
         const onInput = (e) => {
           markdownTL[now] = e.target.innerText;
         };
@@ -241,6 +271,7 @@
           scrollEditorH[now] = e.target.scrollHeight;
           scrollEditor[now] = e.target.scrollTop ;
         };
+
         const style = {
           "width": "100%",
           "height": "100%",
