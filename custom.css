@@ -19,3 +19,5 @@ table td,
 table th{
       border:solid 1px #ccc;
 }
+
+img{max-width: 100%;}
