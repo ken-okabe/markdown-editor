@@ -14,7 +14,6 @@
   const Dialog = remote.dialog;
 
   //=============================================
-
   const TimelineEl = (timelineElm) => {
 
     class TimelineComponent extends React.Component {
@@ -50,44 +49,12 @@
       });
   });
 
-
   const dummyTL = contentLoadTL
     .sync((data) => (markdownTL[now] = data))
     .sync(() => {
       const f = () => {
         document.getElementById("editor").scrollTop = 1;
         document.getElementById("viewer").scrollTop = 1;
-
-        const insertTextAtCursor = (text) => {
-          var sel,
-            range,
-            html;
-          if (window.getSelection) {
-            sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-              range = sel.getRangeAt(0);
-              range.deleteContents();
-              range.insertNode(document.createTextNode(text));
-            }
-          } else if (document.selection && document.selection.createRange) {
-            document.selection.createRange().text = text;
-          }
-        };
-        document.getElementById("editor")
-          .addEventListener("paste", (e) => {
-            e.preventDefault();
-            (e.clipboardData && e.clipboardData.getData)
-              ? (() => {
-                const text = e.clipboardData.getData("text/plain");
-                document.execCommand("insertHTML", false, text);
-              })()
-              : (window.clipboardData && window.clipboardData.getData)
-                ? (() => {
-                  var text1 = window.clipboardData.getData("Text");
-                  insertTextAtCursor(text1);
-                })()
-                : true;
-          });
       };
       setTimeout(f, 1000);
     });
@@ -145,7 +112,6 @@
      </div>);
   };
 
-
   const Panes = (style0) => {
     const style1 = {
       "width": "100%",
@@ -174,12 +140,8 @@
       );
   };
 
-
-
   const markdownTL = T();
-
   const renderer = new marked.Renderer();
-
   marked.setOptions({
     renderer: renderer,
     pedantic: false,
@@ -236,19 +198,23 @@
   const percent = (val) => (Math.round(val * 100) / 100);
 
   const scrollEditorR = scrollEditor
-    .sync(val => percent((val + (editorH[now] / 2)) / scrollEditorH[now]));
+    .sync(val => percent((val + (editorH[now] / 2))
+      / scrollEditorH[now]));
   const scrollViewerR = scrollViewer
-    .sync(val => percent((val + (viewerH[now] / 2)) / scrollViewerH[now]));
+    .sync(val => percent((val + (viewerH[now] / 2))
+      / scrollViewerH[now]));
 
   const scrollViewerTarget = (scrollEditorR)(oneSecInterval)
-    .sync(([ratio, interval]) => scrollViewerH[now] * ratio - (viewerH[now] / 2));
+    .sync(([ratio, interval]) => scrollViewerH[now] * ratio
+      - (viewerH[now] / 2));
 
   const pipleineV = scrollViewerTarget
     .sync(target => {
       document.getElementById("viewer").scrollTop = target;
     });
   const scrollEditorTarget = (scrollViewerR)(oneSecInterval)
-    .sync(([ratio, interval]) => scrollEditorH[now] * ratio - (editorH[now] / 2));
+    .sync(([ratio, interval]) => scrollEditorH[now] * ratio
+      - (editorH[now] / 2));
 
   const pipelineE = scrollEditorTarget
     .sync(target => {
@@ -271,7 +237,6 @@
           scrollEditorH[now] = e.target.scrollHeight;
           scrollEditor[now] = e.target.scrollTop ;
         };
-
         const style = {
           "width": "100%",
           "height": "100%",
@@ -279,7 +244,7 @@
           "overflow": "auto",
         };
         return (<div
-          contentEditable
+          contentEditable={"plaintext-only"}
           id={"editor"}
           className={"editor"}
           style={style}
@@ -291,7 +256,6 @@
           />);
       })
   );
-
 
   const Viewer = () => TimelineEl(
     htmlTL
@@ -317,7 +281,6 @@
       })
   );
   //----------
-
   //======================================================
   render(Main(), document.getElementById("container"));
 

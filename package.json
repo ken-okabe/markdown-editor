@@ -1,6 +1,6 @@
 {
   "name": "markdown-editor",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "electron-react-brace-marked base markdown editor",
   "main": "main.js",
   "scripts": {
