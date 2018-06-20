@@ -21,3 +21,20 @@ table th{
 }
 
 img{max-width: 100%;}
+
+blockquote{
+background-color:#ddd;
+padding:1em 1em 1em 3em;
+position:relative;
+border-left:3px solid #333;
+}
+blockquote:before{
+content:"“";
+font-size:600%;
+line-height:1em;
+font-family:"ＭＳ Ｐゴシック",sans-serif;
+color:#999;
+position:absolute;
+left:0;
+top:0;
+}
