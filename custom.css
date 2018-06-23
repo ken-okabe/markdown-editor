@@ -22,19 +22,37 @@ table th{
 
 img{max-width: 100%;}
 
+
 blockquote{
-background-color:#ddd;
-padding:1em 1em 1em 3em;
-position:relative;
-border-left:3px solid #333;
+    margin: 3em 10px;
+    padding: 1.5em 1em;
+    background: #fff;
+    background: url(./blockquote2.gif) no-repeat 1% 5%;
+    border: 5px solid #DBDBDB;
+    border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
 }
-blockquote:before{
-content:"“";
-font-size:600%;
-line-height:1em;
-font-family:"ＭＳ Ｐゴシック",sans-serif;
-color:#999;
-position:absolute;
-left:0;
-top:0;
+
+blockquote em, blockquote i, blockquote cite {
+ font-style: normal;
+}
+blockquote cite {
+ color: #063b58;
+ font-weight: 300;
+ text-transform: uppercase;
+    text-align: right;
+    display: block;
+}
+
+blockquote p{
+    margin: 0;
+    line-height: 160%;
+    color: #063b58;
+    font-size: 90%;
+}
+
+mark {
+  padding: 0;
+  background-color:#ffff00
 }

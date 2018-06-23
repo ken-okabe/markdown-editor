@@ -13,27 +13,26 @@
   const remote = require("electron").remote;
   const Dialog = remote.dialog;
 
+  const Mark = require("mark.js");
   //=============================================
-  const TimelineEl = (timelineElm) => {
+  const FRPComponent = (timeline) => {
 
-    class TimelineComponent extends React.Component {
+    class Timeline extends React.Component {
       constructor() {
         super();
         this.state = {
-          el: timelineElm[now]
+          el: timeline[now]
         };
-        const pipeline = timelineElm
-          .sync((val) => {
-            this.setState({
-              el: val
-            });
-          });
+        const pipeline = timeline
+          .sync(val => this.setState({
+            el: val
+          }));
       }
       render() {
         return (<span>{this.state.el}</span>);
       }
     }
-    return (<TimelineComponent/>);
+    return (<Timeline/>);
   };
   //=============================================
 
@@ -49,16 +48,62 @@
       });
   });
 
+  const markInstance = T();
+  const countTL = T();
+
+  const Counter = () => FRPComponent(countTL);
+
   const dummyTL = contentLoadTL
     .sync((data) => (markdownTL[now] = data))
     .sync(() => {
       const f = () => {
         document.getElementById("editor").scrollTop = 1;
         document.getElementById("viewer").scrollTop = 1;
+
+        const context = document.querySelector("#viewer");
+        markInstance[now] = new Mark(context);
       };
+
       setTimeout(f, 1000);
     });
 
+
+  const searchingTL = T();
+  const sTL = searchingTL
+    .sync(val => search(val));
+
+  const search = (val) => {
+    markInstance[now].unmark({
+      done: () => {
+        markInstance[now].mark(val,
+          {
+            "done": (count) => {
+              countTL[now] = count;
+              return true;
+            }
+          });
+      }
+    });
+  };
+
+
+  const intervalSearchTL = T(
+    (timeline) => {
+      const f = () => timeline[now] = true;
+      setInterval(f, 500);
+    }
+  );
+
+  const pipeline1 = (intervalSearchTL)
+    .sync(() => search(searchingTL[now])
+  );
+
+  /*
+    const bak = searchingTL[now];
+    searchingTL[now] = "!@#$%^&*123&";
+    const f = () => searchingTL[now] = bak;
+    setTimeout(f, 500);
+  */
   const Main = () => {
     const style0 = {
       "position": "fixed",
@@ -100,13 +145,25 @@
       }} >File</Button>
 
       </Col>
-      <Col sm="10" >
+      <Col sm="7" >
         <div style = {styleFile}>
-        {TimelineEl(fileTL)}
+        {FRPComponent(fileTL)}
+      </div>
+      </Col>
+      <Col sm="2" >
+        <div style = {styleFile}>
+        <input
+      type="text"
+      onChange={(e) => searchingTL[now] = e.target.value}/>
+        </div>
+      </Col>
+      <Col sm="1" >
+      <div style = {styleFile}>
+        {Counter()}
       </div>
       </Col>
       </Row>
-      </Container>
+    </Container>
 
       {Panes(style0)}
      </div>);
@@ -221,7 +278,7 @@
       document.getElementById("editor").scrollTop = target;
     });
 
-  const Editor = () => TimelineEl(
+  const Editor = () => FRPComponent(
     contentLoadTL
       .sync(content => {
 
@@ -257,7 +314,7 @@
       })
   );
 
-  const Viewer = () => TimelineEl(
+  const Viewer = () => FRPComponent(
     htmlTL
       .sync(innerHTML => {
         const onScroll = (e) => {
