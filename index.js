@@ -235,12 +235,20 @@
       })()
       : true
   );
-
+  const a = (a) => {
+    const x = 5;
+    return a;
+  };
 
   const oneSecInterval = T(
     (timeline) => {
       const f = () => timeline[now] = true;
-      setInterval(f, 10);
+      setInterval(f, 300);
+    });
+  const twoSecInterval = T(
+    (timeline) => {
+      const f = () => timeline[now] = true;
+      setInterval(f, 1000);
     });
 
   const editorH = T();
@@ -269,7 +277,7 @@
     .sync(target => {
       document.getElementById("viewer").scrollTop = target;
     });
-  const scrollEditorTarget = (scrollViewerR)(oneSecInterval)
+  const scrollEditorTarget = (scrollViewerR)(twoSecInterval)
     .sync(([ratio, interval]) => scrollEditorH[now] * ratio
       - (editorH[now] / 2));
 
